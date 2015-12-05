@@ -3,8 +3,15 @@
 
 
 (defun affiche-grille (grid)
-  (princ "   | A B C | D E F | G H I |" ) (terpri)
-  (princ "**********************************")(terpri)
-  (dotimes (i (car (array-dimensions grid)))
-	    (princ i))
-)
+  (format t "   | A B C | D E F | G H I |~%" )
+  (dotimes (i (array-dimension grid 0));(car (array-dimensions grid)))
+    (progn
+      (if (= (mod i 3) 0)
+	  (format t "****************************~%"))
+      (format t "   ")
+      (dotimes (j (array-dimension grid 1))
+	(progn
+	  (if (= (mod j 3) 0)
+	      (format t "| "))
+	  (format t "~d " (aref grid i j))))
+      (format t "|~%"))))
