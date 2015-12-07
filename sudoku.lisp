@@ -2,7 +2,7 @@
   (make-array '(9 9)))
 
 
-(defun affiche-grille (grid)
+(defun show-grid (grid)
   (format t "   | A B C | D E F | G H I |~%" )
   (dotimes (i (array-dimension grid 0));(car (array-dimensions grid)))
     (progn
@@ -15,3 +15,21 @@
 	      (format t "| "))
 	  (format t "~d " (aref grid i j))))
       (format t "|~%"))))
+
+(defun add-number (grid x y numb)
+  (if (valid-position grid x y numb)
+      (setf (aref grid y x) numb)))
+
+(defun valid-position (grid x y numb)
+  (if (/= (aref grid y x) 0)
+      (return-from valid-position NIL))
+  (dotimes (i 9) (if (= numb (aref grid y i))
+		     (return-from valid-position NIL)))
+  (dotimes (i 9) (if (= numb (aref grid i x))
+		     (return-from valid-position NIL)))
+  (dotimes (i 3)
+    (dotimes (j 3)
+      (if (= numb (aref grid (+ (* 3 (multiple-value-bind (q r) (floor y 3) q)) i) (+ (* 3 (multiple-value-bind (q r) (floor x 3) q)) j)))
+	  (return-from valid-position NIL))))
+  T)
+
