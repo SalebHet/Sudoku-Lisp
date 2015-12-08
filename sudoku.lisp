@@ -1,6 +1,11 @@
 (defun create-grid ()
   (make-array '(9 9)))
 
+(defun create-grid-full ()
+  (make-array '(9 9) :initial-element 9))
+
+
+
 
 (defun show-grid (grid)
   (format t "   | A B C | D E F | G H I |~%" )
@@ -33,3 +38,9 @@
 	  (return-from valid-position NIL))))
   T)
 
+(defun game-over (grid)
+  (dotimes (i 9)
+    (dotimes (j 9)
+      (if (= 0 (aref grid j i))
+	  (return-from game-over NIL))))
+  (return-from game-over T))
