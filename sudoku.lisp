@@ -25,8 +25,11 @@
 	(progn
 	  (if (= (mod j 3) 0)
 	      (format t "| "))
-	  (format t "~d " (aref grid i j))))
-      (format t "|~%"))))
+	  (if (zerop (aref grid i j))
+	      (format t "  ")
+	      (format t "~d " (aref grid i j)))))
+      (format t "|~%")))
+  (format t "****************************~%"))
 
 (defun add-number (grid x y numb)
   (if (valid-position grid x y numb)
@@ -56,5 +59,5 @@
   (loop while (not (game-over +my-grid+)) do
        (show-grid +my-grid+)
        (format t " Ajouter un nombre : Colonne Ligne Nombre ")
-       (if (not (add-number +my-grid+ (read) (read) (read)))
+       (if (not (add-number +my-grid+ (read) (- (read) 1) (read)))
 	   (format t " Position non valide ! Noob !~%"))))
