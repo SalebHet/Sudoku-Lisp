@@ -13,7 +13,7 @@
     (progn
       (if (= (mod i 3) 0)
 	  (format t "****************************~%"))
-      (format t "   ")
+      (format t " ~d " (+ 1 i))
       (dotimes (j (array-dimension grid 1))
 	(progn
 	  (if (= (mod j 3) 0)
