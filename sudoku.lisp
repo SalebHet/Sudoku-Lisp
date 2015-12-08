@@ -59,5 +59,7 @@
   (loop while (not (game-over +my-grid+)) do
        (show-grid +my-grid+)
        (format t " Ajouter un nombre : Colonne Ligne Nombre ")
-       (if (not (add-number +my-grid+ (read) (- (read) 1) (read)))
+       (if (not (add-number +my-grid+
+			    (cdr (assoc (read) '((A . 0) (B . 1) (C . 2) (D . 3) (E . 4) (F . 5) (G . 6) (H . 7) (F . 8))))
+			    (- (read) 1) (read)))
 	   (format t " Position non valide ! Noob !~%"))))
