@@ -1,11 +1,18 @@
+(defconstant +my-grid+ #2A((0 2 8 0 0 0 0 6 0)
+			   (0 0 0 0 0 8 5 0 4)
+			   (0 3 9 0 6 0 7 0 0)
+			   (3 0 0 2 0 1 0 0 0)
+			   (0 0 5 0 0 0 4 0 0)
+			   (0 0 0 5 0 3 0 0 6)
+			   (0 0 7 0 2 0 3 5 0)
+			   (2 0 3 9 0 0 0 0 0)
+			   (0 9 0 0 0 0 2 4 0)))
+
 (defun create-grid ()
   (make-array '(9 9)))
 
 (defun create-grid-full ()
   (make-array '(9 9) :initial-element 9))
-
-
-
 
 (defun show-grid (grid)
   (format t "   | A B C | D E F | G H I |~%" )
@@ -44,3 +51,10 @@
       (if (= 0 (aref grid j i))
 	  (return-from game-over NIL))))
   (return-from game-over T))
+
+(defun game ()
+  (loop while (not (game-over +my-grid+)) do
+       (show-grid +my-grid+)
+       (format t " Ajouter un nombre : Colonne Ligne Nombre ")
+       (if (not (add-number +my-grid+ (read) (read) (read)))
+	   (format t " Position non valide ! Noob !~%"))))
