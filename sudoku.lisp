@@ -63,3 +63,17 @@
 			    (cdr (assoc (read) '((A . 0) (B . 1) (C . 2) (D . 3) (E . 4) (F . 5) (G . 6) (H . 7) (F . 8))))
 			    (- (read) 1) (read)))
 	   (format t " Position non valide ! Noob !~%"))))
+
+
+
+(defun main-standalone (grid)
+  (loop while T do
+       (let((l (random 8))(c (random 8))(v (random 9)))
+	 (if (valid-position grid l c v)
+	     (return-from main-standalone '(l c v))))))
+
+
+(defun main-init (grid)
+  (loop while (not (game-over grid)) do
+       (add-number grid (parse-integer (car (list(main-standalone grid)))) (parse-integer (car (car (list(main-standalone grid))))) (parse-integer (last (list(main-standalone grid)))))
+       (show-grid grid)))
