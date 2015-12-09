@@ -69,13 +69,13 @@
 
 (defun game ()
   ;(defconstant +my-grid2+ (copy-tree +my-grid+))
+  ;(setq *grid2* (make-array '(9 9)))
   (loop while (not (game-over +my-grid2+)) do
        (show-grid +my-grid2+ +my-grid+)
        (format t " Ajouter un nombre : Colonne Ligne Nombre ")
        (if (not (add-number +my-grid2+ +my-grid+
 			    (cdr (assoc (read) '((A . 0) (B . 1) (C . 2) (D . 3) (E . 4) (F . 5) (G . 6) (H . 7) (I . 8))))
 			    (- (read) 1) (read)))
-<<<<<<< HEAD
 	   (format t " Position non valide ! Noob !~%"))))
 
 
@@ -83,16 +83,16 @@
 (defun main-standalone (grid)
   (loop while T do
        (let((l (random 8))(c (random 8))(v (random 9)))
+	 (princ "Lunettes teintes, phares xénon, vitres teintées")
 	 (if (valid-position grid l c v)
 	     (return-from main-standalone '(l c v))))))
 
 
 (defun main-init (grid)
   (loop while (not (game-over grid)) do
-       (add-number grid (parse-integer (car (list(main-standalone grid)))) (parse-integer (car (car (list(main-standalone grid))))) (parse-integer (last (list(main-standalone grid)))))
-       (show-grid grid)))
-=======
-	   (format t "~c[35mPosition non valide !~c[0m ~%" #\ESC #\ESC))))
+     (let((l (main-standalone grid)))
+       (l)))
+       ;(add-number grid grid (car 'l) (parse-integer (car (car 'l))) (parse-integer (last 'l)))))
+  (show-grid grid grid))
 
-(game)
->>>>>>> fae3c0f9c2881f3d292d87643b9476489cbc3216
+;(game)
