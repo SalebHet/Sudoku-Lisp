@@ -8,21 +8,18 @@
 			   (2 0 3 9 0 0 0 0 0)
 			   (0 9 0 0 0 0 2 4 0)))
 
-(defconstant +my-grid2+ #2A((0 2 8 0 0 0 0 6 0)
-			   (0 0 0 0 0 8 5 0 4)
-			   (0 3 9 0 6 0 7 0 0)
-			   (3 0 0 2 0 1 0 0 0)
-			   (0 0 5 0 0 0 4 0 0)
-			   (0 0 0 5 0 3 0 0 6)
-			   (0 0 7 0 2 0 3 5 0)
-			   (2 0 3 9 0 0 0 0 0)
-			   (0 9 0 0 0 0 2 4 0)))
-
 (defun create-grid ()
   (make-array '(9 9)))
 
 (defun create-grid-full ()
   (make-array '(9 9) :initial-element 9))
+
+(defun copy-grid (grid)
+  (let ((grid2 (make-array (array-dimensions grid))))
+    (dotimes (i (array-dimension grid 0))
+      (dotimes (j (array-dimension grid 1))
+        (setf (aref grid2 i j) (aref grid i j))))
+    (return-from copy-grid grid2)))        
 
 (defun show-grid (grid grid2)
   (format t "   | A B C | D E F | G H I |~%" )
@@ -69,30 +66,30 @@
 
 (defun game ()
   ;(defconstant +my-grid2+ (copy-tree +my-grid+))
-  ;(setq *grid2* (make-array '(9 9)))
-  (loop while (not (game-over +my-grid2+)) do
-       (show-grid +my-grid2+ +my-grid+)
-       (format t " Ajouter un nombre : Colonne Ligne Nombre ")
-       (if (not (add-number +my-grid2+ +my-grid+
+  (setq *grid2* (copy-grid +my-grid+))
+  (loop while (not (game-over *grid2*)) do
+       (show-grid *grid2* +my-grid+)
+       (format t " Ajouter un nombre : Colonne Ligne Nombre ~%")
+       (if (not (add-number *grid2* +my-grid+
 			    (cdr (assoc (read) '((A . 0) (B . 1) (C . 2) (D . 3) (E . 4) (F . 5) (G . 6) (H . 7) (I . 8))))
 			    (- (read) 1) (read)))
 	   (format t " Position non valide ! Noob !~%"))))
 
 
 
-(defun main-standalone (grid)
-  (loop while T do
-       (let((l (random 8))(c (random 8))(v (random 9)))
-	 (princ "Lunettes teintes, phares xénon, vitres teintées")
-	 (if (valid-position grid l c v)
-	     (return-from main-standalone '(l c v))))))
+;(defun main-standalone (grid)
+;  (loop while T do
+;       (let((l (random 8))(c (random 8))(v (random 9)))
+;	 (princ "Lunettes teintes, phares xénon, vitres teintées")
+;	 (if (valid-position grid l c v)
+;	     (return-from main-standalone '(l c v))))))
 
 
-(defun main-init (grid)
-  (loop while (not (game-over grid)) do
-     (let((l (main-standalone grid)))
-       (l)))
-       ;(add-number grid grid (car 'l) (parse-integer (car (car 'l))) (parse-integer (last 'l)))))
-  (show-grid grid grid))
+;(defun main-init (grid)
+;  (loop while (not (game-over grid)) do
+;     (let((l (main-standalone grid)))
+;       (l)))
+;       ;(add-number grid grid (car 'l) (parse-integer (car (car 'l))) (parse-integer (last 'l)))))
+;  (show-grid grid grid))
 
-;(game)
+(game)
