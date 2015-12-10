@@ -84,31 +84,41 @@
 (defun main-standalone ()
   (dotimes (x 9)
     (dotimes (y 9)
-      (if (zerop (aref *s2gsolved* x y))
+      (if (zerop (aref *s2gsolved* y x))
         (progn
-          (loop for i from x to 9 do
+          (loop for i from (+ 1 x) to 8 do
             (check x y i y))
-          (loop for j from y to 9 do
+          (loop for j from (+ 1 y) to 8 do
             (check x y x j))
-          (loop for b in (list-block *s2gpossibles* x y) do;FAIL, check too much
-            (format t "")))))))
+	  (let ((l (list-block x y)))
+	    (format t "~a" l)))))))
+	    ;(loop for b in 'l do;FAIL, check too much
+            ;(format t ""))))))))
 
-(defun check (x y i j);x,y is not resolved
-  (if (aref *s2gpossibles* x y (aref *s2gsolved* i j))
-    (progn
-      (setf (aref *s2gpossibles* x y (aref *s2gsolved* i j)) nil)
-      (setf (aref *s2gpossibles* x y 0) (- (aref *s2gpossibles* x y 0) 1));????????????
-      (if (= (aref *s2gpossibles* x y 0) 1)
-        (setf (aref *s2gsolved* x y) (only-possibility *s2gpossibles* x y))))));should return
+(defun check (x y i j);x,y is not resolved	
+  (format t "~a ~a ~%" j i)
+  (if (not (zerop (aref *s2gsolved* j i)))
+    (if (aref *s2gpossibles* x y (aref *s2gsolved* j i))
+      (progn
+	(format t "~a ~a " j i)
+        (format t "~a" (aref *s2gsolved* j i))
+        (format t "~a" (aref *s2gpossibles* x y (aref *s2gsolved* j i)))
+        (setf (aref *s2gpossibles* x y (aref *s2gsolved* j i)) nil)
+        (format t "~a~%" (aref *s2gpossibles* x y (aref *s2gsolved* j i)))
+        (setf (aref *s2gpossibles* x y 0) (- (aref *s2gpossibles* x y 0) 1));????????????
+        (if (= (aref *s2gpossibles* x y 0) 1)
+          (setf (aref *s2gsolved* y x) (only-possibility *s2gpossibles* x y)))))));should return
   ;(if equal teste si les meme -> supprimer possibilites lignes/colonnes/block
   
 
-(defun list-block (a x y)
-  (let ((l ()))
+(defun list-block (x y)
+  (let ((l (list)))
+    (format t "tamere le lisp~%")
     (dotimes (i 3)
       (dotimes (j 3)
-        (cons (aref a (+ (* 3 (floor y 3)) i) (+ (* 3 (floor x 3)) j)) 
-'l)))));;;;;;;;;;;;;;;;;;;;;;;;RETURN
+        (progn (format t "tamere le lisp~%")
+        (cons (cons (+ (* 3 (floor y 3)) i)  (+ (* 3 (floor x 3)) j)) l))))
+    (return-from list-block l)))
 
 (defun possibilities-number (p x y)
   (let ((c 0))
@@ -123,4 +133,4 @@
 
 ;(sudoku +my-grid+)
 (init-standalone +my-grid+)
-;(main-standalone)
+(main-standalone)
