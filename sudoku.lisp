@@ -65,14 +65,14 @@
   (return-from game-over T))
 
 (defun sudoku (grid)
-  (let ((*grid2* (copy-grid grid)))
-    (loop while (not (game-over *grid2*)) do
-       (show-grid *grid2* grid)
+  (let ((grid2 (copy-grid grid)))
+    (loop while (not (game-over grid2)) do
+       (show-grid grid2 grid)
        (format t " Ajouter un nombre : Colonne Ligne Nombre ~%")
-       (if (not (add-number *grid2* grid
+       (if (not (add-number grid2 grid
 			    (cdr (assoc (read) '((A . 0) (B . 1) (C . 2) (D . 3) (E . 4) (F . 5) (G . 6) (H . 7) (I . 8))))
 			    (- (read) 1) (read)))
-	   (format t " Position non valide ! Noob !~%")))))
+	   (format t " Position non valide !~%")))))
 
 (defun init-standalone (grid)
   (defparameter *s2gsolved* (copy-grid grid))
@@ -90,7 +90,7 @@
             (check x y i y))
           (loop for j from y to 9 do
             (check x y x j))
-          (loop for b in (list-blocks *s2gpossibles* x y) do;FAIL, check too much
+          (loop for b in (list-block *s2gpossibles* x y) do;FAIL, check too much
             (format t "")))))))
 
 (defun check (x y i j);x,y is not resolved
@@ -113,7 +113,7 @@
 (defun possibilities-number (p x y)
   (let ((c 0))
     (dotimes (i 9)
-      (if (= (aref p x y i) T)
+      (if (eq (aref p x y i) T)
         (setf c (+ c 1))))));;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;RETURN C
 
 (defun only-possibility (p x y)
