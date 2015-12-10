@@ -64,32 +64,63 @@
 	  (return-from game-over NIL))))
   (return-from game-over T))
 
-(defun game ()
-  ;(defconstant +my-grid2+ (copy-tree +my-grid+))
-  (setq *grid2* (copy-grid +my-grid+))
-  (loop while (not (game-over *grid2*)) do
-       (show-grid *grid2* +my-grid+)
+(defun sudoku (grid)
+  (let ((*grid2* (copy-grid grid)))
+    (loop while (not (game-over *grid2*)) do
+       (show-grid *grid2* grid)
        (format t " Ajouter un nombre : Colonne Ligne Nombre ~%")
-       (if (not (add-number *grid2* +my-grid+
+       (if (not (add-number *grid2* grid
 			    (cdr (assoc (read) '((A . 0) (B . 1) (C . 2) (D . 3) (E . 4) (F . 5) (G . 6) (H . 7) (I . 8))))
 			    (- (read) 1) (read)))
-	   (format t " Position non valide ! Noob !~%"))))
+	   (format t " Position non valide ! Noob !~%")))))
 
+(defun init-standalone (grid)
+  (defparameter *s2gsolved* (copy-grid grid))
+  (defparameter *s2gpossibles* (make-array '(9 9 10) :initial-element T))
+  (dotimes (x 9)
+    (dotimes (y 9)
+      (setf (aref *s2gpossibles* x y 0) 9))))
 
+(defun main-standalone ()
+  (dotimes (x 9)
+    (dotimes (y 9)
+      (if (zerop (aref *s2gsolved* x y))
+        (progn
+          (loop for i from x to 9 do
+            (check x y i y))
+          (loop for j from y to 9 do
+            (check x y x j))
+          (loop for b in (list-blocks *s2gpossibles* x y) do;FAIL, check too much
+            (format t "")))))))
 
-;(defun main-standalone (grid)
-;  (loop while T do
-;       (let((l (random 8))(c (random 8))(v (random 9)))
-;	 (princ "Lunettes teintes, phares xénon, vitres teintées")
-;	 (if (valid-position grid l c v)
-;	     (return-from main-standalone '(l c v))))))
+(defun check (x y i j);x,y is not resolved
+  (if (aref *s2gpossibles* x y (aref *s2gsolved* i j))
+    (progn
+      (setf (aref *s2gpossibles* x y (aref *s2gsolved* i j)) nil)
+      (setf (aref *s2gpossibles* x y 0) (- (aref *s2gpossibles* x y 0) 1));????????????
+      (if (= (aref *s2gpossibles* x y 0) 1)
+        (setf (aref *s2gsolved* x y) (only-possibility *s2gpossibles* x y))))));should return
+  ;(if equal teste si les meme -> supprimer possibilites lignes/colonnes/block
+  
 
+(defun list-block (a x y)
+  (let ((l ()))
+    (dotimes (i 3)
+      (dotimes (j 3)
+        (cons (aref a (+ (* 3 (floor y 3)) i) (+ (* 3 (floor x 3)) j)) 
+'l)))));;;;;;;;;;;;;;;;;;;;;;;;RETURN
 
-;(defun main-init (grid)
-;  (loop while (not (game-over grid)) do
-;     (let((l (main-standalone grid)))
-;       (l)))
-;       ;(add-number grid grid (car 'l) (parse-integer (car (car 'l))) (parse-integer (last 'l)))))
-;  (show-grid grid grid))
+(defun possibilities-number (p x y)
+  (let ((c 0))
+    (dotimes (i 9)
+      (if (= (aref p x y i) T)
+        (setf c (+ c 1))))));;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;RETURN C
 
-(game)
+(defun only-possibility (p x y)
+  (loop for i from 1 to 9 do ;OK??????
+    (if (aref p x y i)
+      (return-from only-possibility i))))
+
+;(sudoku +my-grid+)
+(init-standalone +my-grid+)
+;(main-standalone)
