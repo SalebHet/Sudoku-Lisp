@@ -1,12 +1,22 @@
-(defconstant +my-grid+ #2A((0 2 8 0 0 0 0 6 0)
-			   (0 0 0 0 0 8 5 0 4)
-			   (0 3 9 0 6 0 7 0 0)
-			   (3 0 0 2 0 1 0 0 0)
-			   (0 0 5 0 0 0 4 0 0)
-			   (0 0 0 5 0 3 0 0 6)
-			   (0 0 7 0 2 0 3 5 0)
-			   (2 0 3 9 0 0 0 0 0)
-			   (0 9 0 0 0 0 2 4 0)))
+;(defconstant +my-grid+ #2A((0 2 8 0 0 0 0 6 0)
+;			   (0 0 0 0 0 8 5 0 4)
+;			   (0 3 9 0 6 0 7 0 0)
+;			   (3 0 0 2 0 1 0 0 0)
+;			   (0 0 5 0 0 0 4 0 0)
+;			   (0 0 0 5 0 3 0 0 6)
+;			   (0 0 7 0 2 0 3 5 0)
+;			   (2 0 3 9 0 0 0 0 0)
+;			   (0 9 0 0 0 0 2 4 0)))
+
+(defconstant +my-grid+ #2A((1 0 0 0 0 4 0 0 5)
+			   (0 0 0 9 5 0 0 8 0)
+			   (0 0 0 0 0 3 0 9 0)
+			   (0 0 5 0 0 2 0 0 4)
+			   (0 0 1 0 6 0 7 0 0)
+			   (7 0 0 3 0 0 2 0 0)
+			   (0 6 0 5 0 0 0 0 0)
+			   (0 8 0 0 1 6 0 0 0)
+			   (5 0 0 2 0 0 0 0 7)))
 
 (defparameter *s2gsolved* ())
 (defparameter *s2gpossibles* ())
@@ -26,7 +36,7 @@
 
 (defun show-grid (grid grid2)
   (format t "   | A B C | D E F | G H I |~%" )
-  (dotimes (i (array-dimension grid 0));(car (array-dimensions grid)))
+  (dotimes (i (array-dimension grid 0))
     (progn
       (if (= (mod i 3) 0)
 	  (format t "****************************~%"))
@@ -90,34 +100,38 @@
       (if (zerop (aref *s2gsolved* y x))
         (progn
           (loop for i from 0 to 8 if (/= i x) do
-            (check x y i y))
+            (if (check x y i y)
+              (return-from main-standalone "BLUBLUBLUBBBB1")))
           (loop for j from 0 to 8 if (/= j y) do
-            (check x y x j))
+	    (if (check x y x j)
+              (return-from main-standalone "BLUBLUBLUBBBB2")))
 	  (let ((l (list-block x y)))
 	    (loop for b in l do
               (if (not (eq (cons x y) l))
-                (check x y (car b) (cdr b)))))
+	        (if (check x y (car b) (cdr b))
+                  (return-from main-standalone "BLUBLUBLUBBBB3")))))
           (loop for i from 1 to 9 do (progn
-            (if (only-in-line x y i)
-	      (setf (aref *s2gsolved* y x) i));should RETURN!!!!!
-            (if (only-in-column x y i)
-	      (setf (aref *s2gsolved* y x) i));should RETURN!!!!!
-            (if (only-in-block x y i)
-	      (setf (aref *s2gsolved* y x) i)))))))));should RETURN!!!!!
+            (if (only-in-line x y i)(progn
+	      (setf (aref *s2gsolved* y x) i)
+              (return-from main-standalone "BLUBLUBLUBBBB4")))
+            (if (only-in-column x y i)(progn
+	      (setf (aref *s2gsolved* y x) i)
+              (return-from main-standalone "BLUBLUBLUBBBB5")))
+            (if (only-in-block x y i)(progn
+	      (setf (aref *s2gsolved* y x) i)
+              (return-from main-standalone "BLUBLUBLUBBBB6"))))))))))
 
-(defun check (x y i j);x,y is not resolved	
-  (format t "~a ~a ~%" j i)
+(defun check (x y i j);x,y is not resolved
   (if (not (zerop (aref *s2gsolved* j i)))
     (if (aref *s2gpossibles* x y (aref *s2gsolved* j i))
       (progn
-	(format t "~a ~a " j i)
-        (format t "~a" (aref *s2gsolved* j i))
-        (format t "~a" (aref *s2gpossibles* x y (aref *s2gsolved* j i)))
         (setf (aref *s2gpossibles* x y (aref *s2gsolved* j i)) nil)
-        (format t "~a~%" (aref *s2gpossibles* x y (aref *s2gsolved* j i)))
-        (setf (aref *s2gpossibles* x y 0) (- (aref *s2gpossibles* x y 0) 1));????????????
+        (setf (aref *s2gpossibles* x y 0) (- (aref *s2gpossibles* x y 0) 1))
         (if (= (aref *s2gpossibles* x y 0) 1)
-          (setf (aref *s2gsolved* y x) (only-possibility *s2gpossibles* x y)))))));should return
+	  (progn
+            (setf (aref *s2gsolved* y x) (only-possibility *s2gpossibles* x y))
+            (return-from check "BLUBLUB"))))))
+  nil);should return
   ;(if equal teste si les meme -> supprimer possibilites lignes/colonnes/block
   
 ;(defun list-block (x y l)
@@ -137,22 +151,21 @@
 (defun list-block (x y)
   (list-block-t (* 3 (floor x 3)) (* 3 (floor y 3)) '()))
 
-(defun possibilities-number (p x y)
-  (let ((c 0))
-    (dotimes (i 9)
-      (if (eq (aref p x y i) T)
-        (setf c (+ c 1))))));;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;RETURN C
+;(defun possibilities-number (p x y)
+;  (let ((c 0))
+;    (dotimes (i 9)
+;      (if (eq (aref p x y i) T)
+;        (setf c (+ c 1))))));;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;RETURN C
 
 (defun only-possibility (p x y)
-  (loop for i from 1 to 9 do ;OK??????
+  (loop for i from 1 to 9 do
     (if (aref p x y i)
       (return-from only-possibility i))))
 
 (defun only-in-line (x y p)
   (loop for i from 0 to 8 do
     (if (= (aref *s2gsolved* y i) p)
-      (if (/= x i)
-        (return-from only-in-line nil))
+      (return-from only-in-line nil)
       (if (aref *s2gpossibles* i y p)
         (if (/= x i)
           (return-from only-in-line nil)))))
@@ -161,8 +174,7 @@
 (defun only-in-column (x y p)
   (loop for j from 0 to 8 do
     (if (= (aref *s2gsolved* j x) p)
-      (if (/= j y)
-        (return-from only-in-column nil))
+      (return-from only-in-column nil)
       (if (aref *s2gpossibles* x j p)
         (if (/= j y)
           (return-from only-in-column nil)))))
@@ -173,22 +185,21 @@
     (loop for b in l do
       (if (not (eq (cons x y) l))
         (if (= (aref *s2gsolved* (cdr b) (car b)) p)
-          (return-from only-in-block nil))
-          (if (aref *s2gpossibles* (car b) (cdr b) p)
-            (return-from only-in-block nil)))))
+          (return-from only-in-block nil)
+          (if (zerop (aref *s2gsolved* (cdr b) (car b)))
+            (if (aref *s2gpossibles* (car b) (cdr b) p)
+              (return-from only-in-block nil)))))))
   T)
 
+(defun resolve(grid)
+  (init-standalone grid)
+  ;(loop while (not (game-over grid)) do (progn
+  (dotimes (i 200)
+       (main-standalone)))
+       ;(show-grid *s2gsolved* grid))))
 ;(sudoku +my-grid+)
-(init-standalone +my-grid+)
-(main-standalone)
-(format t "~a ~%" *s2gpossibles*)
-(main-standalone)
-(main-standalone)(main-standalone)(main-standalone)(main-standalone)(main-standalone)(main-standalone)
-(main-standalone)(main-standalone)(main-standalone)(main-standalone)(main-standalone)
-(main-standalone)(main-standalone)(main-standalone)(main-standalone)
 
+;(format t "~a~%" (main-standalone))
 
-
-
-
-(show-grid *s2gsolved* +my-grid+)
+(resolve +my-grid+)
+;(show-grid *s2gsolved* +my-grid+)
