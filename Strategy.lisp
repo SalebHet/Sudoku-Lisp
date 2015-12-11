@@ -107,7 +107,7 @@
               (return-from main-standalone "BLUBLUBLUBBBB2")))
 	  (let ((l (list-block x y)))
 	    (loop for b in l do
-              (if (not (eq (cons x y) l))
+              (if (not (equal (cons x y) l))
 	        (if (check x y (car b) (cdr b))
                   (return-from main-standalone "BLUBLUBLUBBBB3")))))
           (loop for i from 1 to 9 do (progn
@@ -183,18 +183,29 @@
 (defun only-in-block (x y p)
   (let ((l (list-block x y)))
     (loop for b in l do
-      (if (not (eq (cons x y) l))
+      (if (not (equal (cons x y) b))
         (if (= (aref *s2gsolved* (cdr b) (car b)) p)
           (return-from only-in-block nil)
           (if (zerop (aref *s2gsolved* (cdr b) (car b)))
             (if (aref *s2gpossibles* (car b) (cdr b) p)
               (return-from only-in-block nil)))))))
   T)
-
+(defun only-in-blockw (x y p)
+  (let ((l (list-block x y)))
+    (loop for b in l do
+      (if (not (equal (cons x y) b))
+        (if (= (aref *s2gsolved* (cdr b) (car b)) p)(progn
+          (format t "NiQUER LA GAME1 ~%")
+            (return-from only-in-blockw nil))
+          (if (zerop (aref *s2gsolved* (cdr b) (car b)))
+            (if (aref *s2gpossibles* (car b) (cdr b) p)(progn
+              (format t "NiQUER LA GAME2 ~a ~a ~%"(car b) (cdr b) )
+              (return-from only-in-blockw nil))))))))
+  T)
 (defun resolve(grid)
   (init-standalone grid)
   ;(loop while (not (game-over grid)) do (progn
-  (dotimes (i 200)
+  (dotimes (i 1000)
        (main-standalone)))
        ;(show-grid *s2gsolved* grid))))
 ;(sudoku +my-grid+)
@@ -202,4 +213,4 @@
 ;(format t "~a~%" (main-standalone))
 
 (resolve +my-grid+)
-;(show-grid *s2gsolved* +my-grid+)
+(show-grid *s2gsolved* +my-grid+)
