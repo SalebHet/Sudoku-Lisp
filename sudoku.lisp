@@ -8,6 +8,9 @@
 			   (2 0 3 9 0 0 0 0 0)
 			   (0 9 0 0 0 0 2 4 0)))
 
+(defparameter *s2gsolved* ())
+(defparameter *s2gpossibles* ())
+
 (defun create-grid ()
   (make-array '(9 9)))
 
@@ -75,8 +78,8 @@
 	   (format t " Position non valide !~%")))))
 
 (defun init-standalone (grid)
-  (defparameter *s2gsolved* (copy-grid grid))
-  (defparameter *s2gpossibles* (make-array '(9 9 10) :initial-element T))
+  (setf *s2gsolved* (copy-grid grid))
+  (setf *s2gpossibles* (make-array '(9 9 10) :initial-element T))
   (dotimes (x 9)
     (dotimes (y 9)
       (setf (aref *s2gpossibles* x y 0) 9))))
@@ -86,14 +89,21 @@
     (dotimes (y 9)
       (if (zerop (aref *s2gsolved* y x))
         (progn
-          (loop for i from (+ 1 x) to 8 do
+          (loop for i from 0 to 8 if (/= i x) do
             (check x y i y))
-          (loop for j from (+ 1 y) to 8 do
+          (loop for j from 0 to 8 if (/= j y) do
             (check x y x j))
 	  (let ((l (list-block x y)))
-	    (format t "~a" l)))))))
-	    ;(loop for b in 'l do;FAIL, check too much
-            ;(format t ""))))))))
+	    (loop for b in l do
+              (if (not (eq (cons x y) l))
+                (check x y (car b) (cdr b)))))
+          (loop for i from 1 to 9 do (progn
+            (if (only-in-line x y i)
+	      (setf (aref *s2gsolved* y x) i));should RETURN!!!!!
+            (if (only-in-column x y i)
+	      (setf (aref *s2gsolved* y x) i));should RETURN!!!!!
+            (if (only-in-block x y i)
+	      (setf (aref *s2gsolved* y x) i)))))))));should RETURN!!!!!
 
 (defun check (x y i j);x,y is not resolved	
   (format t "~a ~a ~%" j i)
@@ -110,15 +120,22 @@
           (setf (aref *s2gsolved* y x) (only-possibility *s2gpossibles* x y)))))));should return
   ;(if equal teste si les meme -> supprimer possibilites lignes/colonnes/block
   
+;(defun list-block (x y l)
+;  (if (zerop (mod (+ 1 x) 3))
+;    (if (zerop (mod (+ 1 y) 3))
+;      (cons (cons x y) l)
+;      (cons (cons x y) (list-block (- x 2) (+ 1 y) l)))
+;    (cons (cons x y) (list-block (+ 1 x) y l)))) 
+
+(defun list-block-t (x y l)
+  (if (zerop (mod (+ 1 x) 3))
+    (if (zerop (mod (+ 1 y) 3))
+      (cons (cons x y) l)
+      (cons (cons x y) (list-block-t (- x 2) (+ 1 y) l)))
+    (cons (cons x y) (list-block-t (+ 1 x) y l))))
 
 (defun list-block (x y)
-  (let ((l (list)))
-    (format t "tamere le lisp~%")
-    (dotimes (i 3)
-      (dotimes (j 3)
-        (progn (format t "tamere le lisp~%")
-        (cons (cons (+ (* 3 (floor y 3)) i)  (+ (* 3 (floor x 3)) j)) l))))
-    (return-from list-block l)))
+  (list-block-t (* 3 (floor x 3)) (* 3 (floor y 3)) '()))
 
 (defun possibilities-number (p x y)
   (let ((c 0))
@@ -131,6 +148,47 @@
     (if (aref p x y i)
       (return-from only-possibility i))))
 
+(defun only-in-line (x y p)
+  (loop for i from 0 to 8 do
+    (if (= (aref *s2gsolved* y i) p)
+      (if (/= x i)
+        (return-from only-in-line nil))
+      (if (aref *s2gpossibles* i y p)
+        (if (/= x i)
+          (return-from only-in-line nil)))))
+  T)
+
+(defun only-in-column (x y p)
+  (loop for j from 0 to 8 do
+    (if (= (aref *s2gsolved* j x) p)
+      (if (/= j y)
+        (return-from only-in-column nil))
+      (if (aref *s2gpossibles* x j p)
+        (if (/= j y)
+          (return-from only-in-column nil)))))
+  T)
+
+(defun only-in-block (x y p)
+  (let ((l (list-block x y)))
+    (loop for b in l do
+      (if (not (eq (cons x y) l))
+        (if (= (aref *s2gsolved* (cdr b) (car b)) p)
+          (return-from only-in-block nil))
+          (if (aref *s2gpossibles* (car b) (cdr b) p)
+            (return-from only-in-block nil)))))
+  T)
+
 ;(sudoku +my-grid+)
 (init-standalone +my-grid+)
 (main-standalone)
+(format t "~a ~%" *s2gpossibles*)
+(main-standalone)
+(main-standalone)(main-standalone)(main-standalone)(main-standalone)(main-standalone)(main-standalone)
+(main-standalone)(main-standalone)(main-standalone)(main-standalone)(main-standalone)
+(main-standalone)(main-standalone)(main-standalone)(main-standalone)
+
+
+
+
+
+(show-grid *s2gsolved* +my-grid+)
