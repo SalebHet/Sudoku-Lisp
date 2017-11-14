@@ -1,2 +1,2 @@
-# Sudoku2LaGalere
-C'est la hess frer
+# Sudoku - LISP
+Projet éffectuer dans le cadre de l'UE 'Programation Fonctionnelle'
