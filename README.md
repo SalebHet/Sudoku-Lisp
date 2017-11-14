@@ -1,2 +1,2 @@
 # Sudoku - LISP
-Projet éffectuer dans le cadre de l'UE 'Programation Fonctionnelle'
+Projet effectuer dans le cadre de l'UE 'Programation Fonctionnelle'
